@@ -1,0 +1,84 @@
+<tool id="clim_anomaly" name="Plot Climate Scenarios Anomaly" version="1.0.0">
+  <description>Climate Anomaly for Scenarios</description>
+  <requirements>
+     <requirement type="package">clim_anomaly</requirement>
+     <requirement type="package">R</requirement>
+  </requirements>
+  <command>ClimAnomaly.sh $input_type.inputtype $plottype $plot_format $futuredatapackage $basedatapackage $climate_variable $pngoutput</command>
+  <inputs>
+        <param name="climate_variable" type="select" label="Climate Variable">
+             <option selected="yes" value="TMAX">Maximum temperature(degree C)</option>
+             <option value="TMIN">Minimum temperature(degree C)</option>
+             <option value="SRAD">Solar radiation(MJ/m2/d)</option>
+             <option value="RAIN">Precipitation(mm)</option>
+             <option value="TDEW">Dewpoint temperature (degree C)</option>
+             <option value="WIND">Wind speed(m/s)</option>
+             <option value="VPRSD">Vapor press(kPa)</option>
+             <option value="RHUMD">Relative humidity(%)</option>
+         </param>
+         <param name="plottype" type="select" label="plot type: absolute value or relative change">
+             <option selected="yes" value="relative">relative</option>
+             <option value="absolute">absolute</option>
+         </param>
+         <param name="plot_format" type="select" label="Format of the plot">
+             <option selected="yes" value="pdf">PDF</option>
+             <option value="png">PNG</option>
+         </param>
+     <conditional name="input_type">
+         <param name="inputtype" type="select" label="input type: csv_zip or survey_aceb">
+             <option selected="yes" value="zip">.AgMIP or .csv (zipped)</option>
+             <option value="aceb">survey_aceb</option>
+         </param>
+         <when value="zip">
+             <repeat name="futureclimatefiles" title="futureclimate">
+                 <param name="futuredata" type="data" format="zip" label="Input future weather zip Data" />
+             </repeat>
+             <repeat name="baseclimatefiles" title="baseclimate">
+                 <param name="basedata" type="data" format="zip" label="Input current weather zip Data" />
+             </repeat>
+         </when>
+         <when value="aceb">
+            <repeat name="futureclimatefiles" title="futureclimate">
+                <param name="futuredata" type="data" format="aceb" label="Input future Survey Data" />
+            </repeat>
+            <repeat name="baseclimatefiles" title="baseclimate">
+                <param name="basedata" type="data" format="aceb" label="Input current Survey Data" />
+            </repeat>
+         </when>
+     </conditional>
+  </inputs>
+
+<configfiles>
+<configfile name="futuredatapackage">
+    #for $i, $s in enumerate( $input_type.futureclimatefiles ):
+    ${s.futuredata}
+    #end for
+</configfile>
+<configfile name="basedatapackage">
+    #for $i, $s in enumerate( $input_type.baseclimatefiles ):
+    ${s.basedata}
+    #end for
+</configfile>
+</configfiles>
+
+<outputs>
+    <data format="pdf" name="pngoutput" label="Climate Scenario Anamoly">
+    <change_format>
+        <when input="plot_format" value="png" format="png" />
+    </change_format>
+    </data>
+</outputs>
+
+  <help>
+
+**What it does**
+
+	This tool helps to analyze the zipped climate files (generated from tools such as Generate
+	.AgMIP future climate, or others zipped .AgMIP or .csv files). It generates a boxplot presenting 
+	the monthly climate anomalies based on daily weather files (.AgMIP or .csv) of single or multi 
+	climate scenarios and baseline. User needs to specify the climatic variable that want to plot, 
+	and add the entry data through Add New futureclimate and Add New baseline buttons. 
+ 
+  </help>
+
+</tool>
